@@ -29,8 +29,8 @@
                             <div class="input-group-btn">
                                 <button class="btn btn-danger" type="submit">Clear</button>
                             </div>
+                        </form>
                     </div>
-                    </form>
                 </div>
                 &nbsp;
             </div>

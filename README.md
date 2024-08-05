@@ -2,7 +2,7 @@
 
 ### Overview
 
-The User In/Out Data Plugin is a feature for the Phpnuxbill (https://github.com/hotspotbilling/phpnuxbill/) that provides detailed logs of user internet usage. It allows administrators to search, view user connection data by session, including the amount of data transferred and the connection status.
+The User Data Usage Plugin is a feature for the Phpnuxbill (https://github.com/hotspotbilling/phpnuxbill/) that provides detailed logs of user internet usage. It allows administrators to search, view user connection data by session, including the amount of data transferred and the connection status.
 
 ### Features
 Displays detailed user connection logs.

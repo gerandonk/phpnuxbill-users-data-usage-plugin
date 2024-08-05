@@ -1,4 +1,4 @@
-# User In/Out Data Plugin for PHP Mikrotik Billing
+# User Data Usage Plugin for PHP Mikrotik Billing (phpnuxbill)
 
 ### Overview
 

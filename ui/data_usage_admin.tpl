@@ -1,6 +1,4 @@
 {include file="sections/header.tpl"}
-
-<!-- pool -->
 <div class="row">
     <div class="col-sm-12">
         <div class="panel panel-hovered mb20 panel-primary">
@@ -10,7 +8,7 @@
             <div class="panel-body">
                 <div class="text-center" style="padding: 15px">
                     <div class="col-md-4">
-                        <form id="site-search" method="post" action="{$_url}plugin/user_in_out_ui">
+                        <form id="site-search" method="post" action="{$_url}plugin/UserDataUsageAdmin">
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <span class="fa fa-search"></span>
@@ -25,7 +23,7 @@
 
                     </div>
                     <div class="col-md-1">
-                        <form method="post" action="{$_url}plugin/user_in_out_ui">
+                        <form method="post" action="{$_url}plugin/UserDataUsageAdmin">
                             <div class="input-group-btn">
                                 <button class="btn btn-danger" type="submit">Clear</button>
                             </div>
@@ -63,6 +61,4 @@
         </div>
     </div>
 </div>
-</div>
-
 {include file="sections/footer.tpl"}

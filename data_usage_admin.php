@@ -1,31 +1,30 @@
 <?php
 
-register_menu("User In/Out Data", true, "user_in_out_ui", 'RADIUS', '');
+register_menu("UserDataUsage", true, "UserDataUsageAdmin", 'RADIUS', 'fa fa-download');
 
-function user_in_out_ui()
+function UserDataUsageAdmin()
 {
     global $ui;
     _admin();
-    $ui->assign('_title', 'User In/Out Data');
-    $ui->assign('_system_menu', 'radius');
+    $ui->assign('_title', 'DataUsage');
+    $ui->assign('_system_menu', '');
     $admin = Admin::_info();
     $ui->assign('_admin', $admin);
-
     $search = $_POST['q'] ?? '';
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    $perPage = 10;  // Change the number of items per page if needed
+    $page = !isset($_GET['page']) ? 1 : (int)$_GET['page'];
+    $perPage = 10;
 
-    $data = fetch_user_in_out_data($search, $page, $perPage);
-    $total = count_user_in_out_data($search);
-    $pagination = create_pagination($page, $perPage, $total);
+    $data = fetch_user_in_out_data_admin($search, $page, $perPage);
+    $total = count_user_in_out_data_admin($search);
+    $pagination = create_pagination_admin($page, $perPage, $total);
 
     $ui->assign('q', $search);
     $ui->assign('data', $data);
     $ui->assign('pagination', $pagination);
-    $ui->display('inout.tpl');
+    $ui->display('data_usage_admin.tpl');
 }
 
-function fetch_user_in_out_data($search = '', $page = 1, $perPage = 100)
+function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 {
     $query = ORM::for_table('rad_acct')->where_not_equal('acctOutputOctets', '0');
     if ($search) {
@@ -33,12 +32,12 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 100)
     }
 
     $query->limit($perPage)->offset(($page - 1) * $perPage);
-    $data = Paginator::findMany($query, [], $perPage);
+    $data = $query->find_many(); // Corrected method to find_many()
 
     foreach ($data as &$row) {
-        $row->acctOutputOctets = convert_bytes($row->acctOutputOctets);
-        $row->acctInputOctets = convert_bytes($row->acctInputOctets);
-        $row->totalBytes = convert_bytes($row->acctOutputOctets + $row->acctInputOctets);
+        $row->acctOutputOctets = convert_bytes_admin($row->acctOutputOctets);
+        $row->acctInputOctets = convert_bytes_admin($row->acctInputOctets);
+        $row->totalBytes = convert_bytes_admin($row->acctOutputOctets + $row->acctInputOctets);
 
         $lastRecord = ORM::for_table('rad_acct')
             ->where('username', $row->username)
@@ -55,7 +54,7 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 100)
     return $data;
 }
 
-function count_user_in_out_data($search = '')
+function count_user_in_out_data_admin($search = '')
 {
     $query = ORM::for_table('rad_acct')->where_not_equal('acctOutputOctets', '0');
     if ($search) {
@@ -64,19 +63,18 @@ function count_user_in_out_data($search = '')
     return $query->count();
 }
 
-function create_pagination($page, $perPage, $total)
+function create_pagination_admin($page, $perPage, $total)
 {
     $pages = ceil($total / $perPage);
-    $pagination = [
+    return [
         'current' => $page,
         'total' => $pages,
         'previous' => ($page > 1) ? $page - 1 : null,
         'next' => ($page < $pages) ? $page + 1 : null,
     ];
-    return $pagination;
 }
 
-function convert_bytes($bytes)
+function convert_bytes_admin($bytes)
 {
     if ($bytes >= 1073741824) {
         $bytes = number_format($bytes / 1073741824, 2) . ' GB';

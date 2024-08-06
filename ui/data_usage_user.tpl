@@ -1,4 +1,4 @@
-{include file="sections/header.tpl"}
+{include file="sections/user-header.tpl"}
 <div class="row">
     <div class="col-sm-12">
         <div class="panel panel-hovered mb20 panel-primary">
@@ -35,4 +35,4 @@
         </div>
     </div>
 </div>
-{include file="sections/footer.tpl"}
+{include file="sections/user-footer.tpl"}

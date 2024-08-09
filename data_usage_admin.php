@@ -40,8 +40,8 @@ function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
         // Perform sum first, then convert
         $totalBytes = $row->acctoutputoctets + $row->acctinputoctets;
 
-        $row->acctoutputoctets = convert_bytes_admin($row->acctoutputoctets);
-        $row->acctinputoctets = convert_bytes_admin($row->acctinputoctets);
+        $row->acctOutputOctets = convert_bytes_admin($row->acctoutputoctets);
+        $row->acctInputOctets = convert_bytes_admin($row->acctinputoctets);
         $row->totalBytes = convert_bytes_admin($totalBytes);
 
         $lastRecord = ORM::for_table($table)

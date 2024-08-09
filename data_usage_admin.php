@@ -26,22 +26,27 @@ function UserDataUsageAdmin()
 
 function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 {
-    $query = ORM::for_table('rad_acct')->where_not_equal('acctOutputOctets', '0');
+    $table = isMysqlRadius() ? 'radacct' : 'rad_acct';
+    $query = ORM::for_table($table)->where_not_equal('acctoutputoctets', '0');
+
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
 
     $query->limit($perPage)->offset(($page - 1) * $perPage);
-    $data = $query->find_many(); // Corrected method to find_many()
+    $data = $query->find_many();
 
     foreach ($data as &$row) {
-        $row->acctOutputOctets = convert_bytes_admin($row->acctOutputOctets);
-        $row->acctInputOctets = convert_bytes_admin($row->acctInputOctets);
-        $row->totalBytes = convert_bytes_admin($row->acctOutputOctets + $row->acctInputOctets);
+        // Perform sum first, then convert
+        $totalBytes = $row->acctoutputoctets + $row->acctinputoctets;
 
-        $lastRecord = ORM::for_table('rad_acct')
+        $row->acctoutputoctets = convert_bytes_admin($row->acctoutputoctets);
+        $row->acctinputoctets = convert_bytes_admin($row->acctinputoctets);
+        $row->totalBytes = convert_bytes_admin($totalBytes);
+
+        $lastRecord = ORM::for_table($table)
             ->where('username', $row->username)
-            ->order_by_desc('acctstatustype')
+            ->order_by_desc(isMysqlRadius() ? 'acctstoptime' : 'acctstatustype')
             ->find_one();
 
         if ($lastRecord && $lastRecord->acctstatustype == 'Start') {
@@ -56,10 +61,13 @@ function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 
 function count_user_in_out_data_admin($search = '')
 {
-    $query = ORM::for_table('rad_acct')->where_not_equal('acctOutputOctets', '0');
+    $table = isMysqlRadius() ? 'radacct' : 'rad_acct';
+    $query = ORM::for_table($table)->where_not_equal('acctoutputoctets', '0');
+
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
+
     return $query->count();
 }
 

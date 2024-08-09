@@ -107,13 +107,3 @@ function convert_bytes($bytes)
 
     return $bytes;
 }
-
-function isMysqlRadius()
-{
-    try {
-        $record = ORM::forTable('radacct', 'radius')->find_one();
-        return $record !== false;
-    } catch (Exception $e) {
-        return false;
-    }
-}

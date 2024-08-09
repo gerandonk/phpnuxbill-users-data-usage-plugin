@@ -26,9 +26,9 @@ function UserDataUsage()
 function fetch_user_in_out_data($search = '', $page = 1, $perPage = 100)
 {
     if(isMysqlRadius()){
-        $query = ORM::for_table('rad_acct')->where_not_equal('acctOutputOctets', '0');
-    } else {
         $query = ORM::for_table('radacct')->where_not_equal('acctoutputoctets', '0');
+    } else {
+        $query = ORM::for_table('rad_acct')->where_not_equal('acctoutputoctets', '0');
     }
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
@@ -38,17 +38,17 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 100)
     $data = Paginator::findMany($query, [], $perPage);
 
     foreach ($data as &$row) {
-        $row->acctOutputOctets = convert_bytes($row->acctOutputOctets);
-        $row->acctInputOctets = convert_bytes($row->acctInputOctets);
-        $row->totalBytes = convert_bytes($row->acctOutputOctets + $row->acctInputOctets);
+        $row->acctOutputOctets = convert_bytes($row->acctoutputoctets);
+        $row->acctInputOctets = convert_bytes($row->acctinputoctets);
+        $row->totalBytes = convert_bytes($row->acctoutputoctets + $row->acctinputoctets);
 
-        if(!isMysqlRadius()) {
-            $lastRecord = ORM::for_table('rad_acct')
-                ->where('username', $row->username)
-                ->order_by_desc('acctstatustype')
-                ->find_one();
-        }else{
+        if(isMysqlRadius()) {
             $lastRecord = ORM::for_table('radacct')
+                ->where('username', $row->username)
+                ->order_by_desc('acctstoptime')
+                ->find_one();
+        } else {
+            $lastRecord = ORM::for_table('rad_acct')
                 ->where('username', $row->username)
                 ->order_by_desc('acctstatustype')
                 ->find_one();
@@ -66,10 +66,10 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 100)
 
 function count_user_in_out_data($search = '')
 {
-    if(!isMysqlRadius()) {
-        $query = ORM::for_table('rad_acct')->where_not_equal('acctOutputOctets', '0');
-    } else {
+    if(isMysqlRadius()) {
         $query = ORM::for_table('radacct')->where_not_equal('acctoutputoctets', '0');
+    } else {
+        $query = ORM::for_table('rad_acct')->where_not_equal('acctoutputoctets', '0');
     }
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
@@ -106,4 +106,14 @@ function convert_bytes($bytes)
     }
 
     return $bytes;
+}
+
+function isMysqlRadius()
+{
+    try {
+        $record = ORM::forTable('radacct', 'radius')->find_one();
+        return $record !== false;
+    } catch (Exception $e) {
+        return false;
+    }
 }

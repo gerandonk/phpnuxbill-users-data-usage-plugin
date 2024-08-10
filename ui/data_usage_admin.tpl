@@ -3,7 +3,7 @@
     <div class="col-sm-12">
         <div class="panel panel-hovered mb20 panel-primary">
             <div class="panel-heading">
-               Users Data Usage
+                Users Data Usage
             </div>
             <div class="panel-body">
                 <div class="text-center" style="padding: 15px">
@@ -64,3 +64,10 @@
     </div>
 </div>
 {include file="sections/footer.tpl"}
+
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        var amolood = "https://github.com/amolood";
+        $('#version').html('Plugin by: <a href="' + amolood + '">Amolood</a>');
+    });
+</script>

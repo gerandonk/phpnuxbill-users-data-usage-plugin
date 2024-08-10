@@ -1,6 +1,6 @@
 <?php
-
-register_menu("User Data Usage", true, "UserDataUsageAdmin", 'AFTER_DASHBOARD', 'fa fa-download');
+register_menu("User Data Usage", true, "UserDataUsageAdmin",
+    'SERVICES', 'fa fa-bar-chart');
 
 function UserDataUsageAdmin()
 {

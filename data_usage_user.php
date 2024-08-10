@@ -13,7 +13,7 @@ function UserDataUsage()
     $page = !isset($_GET['page']) ? 1 : (int)$_GET['page'];
     $perPage = 10;
 
-    $data = fetch_user_in_out_data_admin($search, $page, $perPage);
+    $data = fetch_user_in_out_data($search, $page, $perPage);
     $total = count_user_in_out_data($search);
     $pagination = create_pagination($page, $perPage, $total);
 
@@ -23,10 +23,10 @@ function UserDataUsage()
     $ui->display('data_usage_user.tpl');
 }
 
-function fetch_user_in_out_data($search = '', $page = 1, $perPage = 100)
+function fetch_user_in_out_data($search = '', $page = 1, $perPage = 10)
 {
 
-    $query = ORM::for_table('rad_acct')->where_not_equal('acctoutputoctets', '0');
+    $query = ORM::for_table('rad_acct');
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }

@@ -3,7 +3,7 @@
     <div class="col-sm-12">
         <div class="panel panel-hovered mb20 panel-primary">
             <div class="panel-heading">
-                User In/Out Data
+               Users Data Usage
             </div>
             <div class="panel-body">
                 <div class="text-center" style="padding: 15px">
@@ -42,6 +42,7 @@
                         <th>Output</th>
                         <th>Total</th>
                         <th>Status</th>
+                        <th>Date</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -52,6 +53,7 @@
                             <td>{$row.acctOutputOctets}</td>
                             <td>{$row.totalBytes}</td>
                             <td>{$row.status}</td>
+                            <td>{$row.dateAdded}</td>
                         </tr>
                     {/foreach}
                     </tbody>

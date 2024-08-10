@@ -10,9 +10,10 @@ function UserDataUsageAdmin()
     $ui->assign('_system_menu', '');
     $admin = Admin::_info();
     $ui->assign('_admin', $admin);
-    $search = $_POST['q'] ?? '';
+    $search = $_GET['q'] ?? '';
     $page = !isset($_GET['page']) ? 1 : (int)$_GET['page'];
     $perPage = 10;
+    sendTelegram($search);
 
     $data = fetch_user_in_out_data_admin($search, $page, $perPage);
     $total = count_user_in_out_data_admin($search);
@@ -26,28 +27,24 @@ function UserDataUsageAdmin()
 
 function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 {
-    $table = isMysqlRadius() ? 'radacct' : 'rad_acct';
-    $query = ORM::for_table($table)->where_not_equal('acctoutputoctets', '0');
-
+    $query = ORM::for_table('rad_acct');
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
 
     $query->limit($perPage)->offset(($page - 1) * $perPage);
-    $data = $query->find_many();
+    $data = Paginator::findMany($query, [], $perPage);
 
-    foreach ($data as &$row) {
-        // Perform sum first, then convert
-        $totalBytes = $row->acctoutputoctets + $row->acctinputoctets;
+    foreach ($data as $row) {
+        $row->acctOutputOctets = convert_bytes($row->acctoutputoctets);
+        $row->acctInputOctets = convert_bytes($row->acctinputoctets);
+        $row->totalBytes = convert_bytes($row->acctoutputoctets + $row->acctinputoctets);
 
-        $row->acctOutputOctets = convert_bytes_admin($row->acctoutputoctets);
-        $row->acctInputOctets = convert_bytes_admin($row->acctinputoctets);
-        $row->totalBytes = convert_bytes_admin($totalBytes);
 
-        $lastRecord = ORM::for_table($table)
-            ->where('username', $row->username)
-            ->order_by_desc(isMysqlRadius() ? 'acctstoptime' : 'acctstatustype')
+        $lastRecord = ORM::for_table('rad_acct')
+            ->order_by_desc('acctstatustype')
             ->find_one();
+
 
         if ($lastRecord && $lastRecord->acctstatustype == 'Start') {
             $row->status = '<span class="badge btn-success">Connected</span>';
@@ -61,13 +58,10 @@ function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 
 function count_user_in_out_data_admin($search = '')
 {
-    $table = isMysqlRadius() ? 'radacct' : 'rad_acct';
-    $query = ORM::for_table($table)->where_not_equal('acctoutputoctets', '0');
-
+    $query = ORM::for_table('rad_acct')->where_not_equal('acctoutputoctets', '0');
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
-
     return $query->count();
 }
 

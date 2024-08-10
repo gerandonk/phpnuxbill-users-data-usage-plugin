@@ -1,6 +1,6 @@
 <?php
 
-register_menu("UserDataUsage", true, "UserDataUsageAdmin", 'RADIUS', 'fa fa-download');
+register_menu("User Data Usage", true, "UserDataUsageAdmin", 'AFTER_DASHBOARD', 'fa fa-download');
 
 function UserDataUsageAdmin()
 {
@@ -26,7 +26,7 @@ function UserDataUsageAdmin()
 
 function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 {
-    $query = ORM::for_table('rad_acct');
+    $query = ORM::for_table('rad_acct')->whereNotEqual('acctoutputoctets', 0);
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
@@ -35,12 +35,12 @@ function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
     $data = Paginator::findMany($query, [], $perPage);
 
     foreach ($data as &$row) {
-        $row->acctOutputOctets = convert_bytes_admin($row->acctoutputoctets);
-        $row->acctInputOctets = convert_bytes_admin($row->acctinputoctets);
+        $row->acctOutputOctets = convert_bytes_admin(floatval($row->acctoutputoctets));
+        $row->acctInputOctets = convert_bytes_admin(floatval($row->acctinputoctets));
         $row->totalBytes = convert_bytes_admin(floatval($row->acctoutputoctets)+ floatval($row->acctunputoctets));
 
         $lastRecord = ORM::for_table('rad_acct')
-            ->where('username', $row->username)
+            ->where('username', $row->username)->whereNotEqual('acctoutputoctets', 0)
             ->order_by_desc('acctstatustype')
             ->find_one();
 
@@ -92,3 +92,4 @@ function convert_bytes_admin($bytes)
 
     return $bytes;
 }
+

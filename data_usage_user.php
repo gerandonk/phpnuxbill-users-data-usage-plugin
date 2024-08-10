@@ -13,7 +13,7 @@ function UserDataUsage()
     $page = !isset($_GET['page']) ? 1 : (int)$_GET['page'];
     $perPage = 10;
 
-    $data = fetch_user_in_out_data($search, $page, $perPage);
+    $data = fetch_user_in_out_data_admin($search, $page, $perPage);
     $total = count_user_in_out_data($search);
     $pagination = create_pagination($page, $perPage, $total);
 

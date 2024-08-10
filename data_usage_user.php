@@ -1,12 +1,13 @@
 <?php
 
-register_menu("UserDataUsage", false, "UserDataUsage", 'AFTER_DASHBOARD', 'fa fa-download');
+register_menu("User Data Usage", false, "UserDataUsage", 'AFTER_DASHBOARD',
+    'fa fa-bar-chart');
 
 function UserDataUsage()
 {
     global $ui;
     $ui->assign('_title', 'DataUsage');
-    $ui->assign('_system_menu', 'home');
+    $ui->assign('_system_menu', '');
     $user = User::_info();
     $ui->assign('_user', $user);
     $search = $user['username'];

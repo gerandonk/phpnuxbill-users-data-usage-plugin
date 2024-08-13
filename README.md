@@ -34,7 +34,7 @@ At the top of the Plugin Installer page, you will see an option to install plugi
 ### Screenshot 1
 ![Screenshot 1](https://github.com/amolood/phpnuxbill-users-data-usage-plugin/blob/main/user.png)
 
-س
+
 #### Thanks for anyone who has contributed to the phpnuxbill project.
 
-جج
+

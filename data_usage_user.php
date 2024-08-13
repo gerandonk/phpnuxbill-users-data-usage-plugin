@@ -1,7 +1,6 @@
 <?php
 
-register_menu("User Data Usage", false, "UserDataUsage", 'AFTER_DASHBOARD',
-    'fa fa-bar-chart');
+register_menu("User Data Usage", false, "UserDataUsage", 'AFTER_DASHBOARD', 'fa fa-bar-chart');
 
 function UserDataUsage()
 {
@@ -26,8 +25,8 @@ function UserDataUsage()
 
 function fetch_user_in_out_data($search = '', $page = 1, $perPage = 10)
 {
-
     $query = ORM::for_table('rad_acct');
+    $query->where_not_equal('acctoutputoctets', 0.00);
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
@@ -40,14 +39,16 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 10)
         $row->acctInputOctets = convert_bytes($row->acctinputoctets);
         $row->totalBytes = convert_bytes($row->acctoutputoctets + $row->acctinputoctets);
 
-        if(isMysqlRadius()) {
+        if (isMysqlRadius()) {
             $lastRecord = ORM::for_table('radacct')
                 ->where('username', $row->username)
+                ->where_not_equal('acctoutputoctets', 0)
                 ->order_by_desc('acctstoptime')
                 ->find_one();
         } else {
             $lastRecord = ORM::for_table('rad_acct')
                 ->where('username', $row->username)
+                ->where_not_equal('acctoutputoctets', 0)
                 ->order_by_desc('acctstatustype')
                 ->find_one();
         }
@@ -64,7 +65,7 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 10)
 
 function count_user_in_out_data($search = '')
 {
-    $query = ORM::for_table('rad_acct')->where_not_equal('acctoutputoctets', '0');
+    $query = ORM::for_table('rad_acct')->where_not_equal('acctoutputoctets', 0.00);
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
@@ -83,21 +84,26 @@ function create_pagination($page, $perPage, $total)
     return $pagination;
 }
 
-function convert_bytes($bytes)
+function convert_bytes($bytes, $format = false)
 {
     if ($bytes >= 1073741824) {
-        $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        $value = $bytes / 1073741824;
+        $unit = 'GB';
     } elseif ($bytes >= 1048576) {
-        $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        $value = $bytes / 1048576;
+        $unit = 'MB';
     } elseif ($bytes >= 1024) {
-        $bytes = number_format($bytes / 1024, 2) . ' KB';
-    } elseif ($bytes > 1) {
-        $bytes = $bytes . ' bytes';
-    } elseif ($bytes == 1) {
-        $bytes = $bytes . ' byte';
+        $value = $bytes / 1024;
+        $unit = 'KB';
     } else {
-        $bytes = '0 bytes';
+        $value = $bytes;
+        $unit = 'bytes';
     }
 
-    return $bytes;
+    if ($format) {
+        return number_format($value, 2) . ' ' . $unit;
+    } else {
+        return number_format($value, 2); // Return numeric value only
+    }
 }
+

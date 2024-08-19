@@ -26,7 +26,11 @@ function UserDataUsageAdmin()
 
 function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 {
+     if(isTableExist('rad_acct')){
     $query = ORM::for_table('rad_acct')->whereNotEqual('acctoutputoctets', 0);
+     }else{
+         $query = ORM::for_table('radacct')->whereNotEqual('acctoutputoctets', 0);
+     }
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
@@ -38,8 +42,11 @@ function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
         $row->acctOutputOctets = convert_bytes_admin(floatval($row->acctoutputoctets));
         $row->acctInputOctets = convert_bytes_admin(floatval($row->acctinputoctets));
         $row->totalBytes = convert_bytes_admin(floatval($row->acctoutputoctets)+ floatval($row->acctunputoctets));
-
-        $lastRecord = ORM::for_table('rad_acct')
+         if(isTableExist('rad_acct')){
+        $lastRecord = ORM::for_table('rad_acct');
+        }else{
+          $lastRecord = ORM::for_table('radacct')
+         }
             ->where('username', $row->username)->whereNotEqual('acctoutputoctets', 0)
             ->order_by_desc('acctstatustype')
             ->find_one();
@@ -56,7 +63,11 @@ function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 
 function count_user_in_out_data_admin($search = '')
 {
-    $query = ORM::for_table('rad_acct');
+    if(isTableExist('rad_acct')){
+        $query = ORM::for_table('rad_acct');
+    }else{
+          $query = ORM::for_table('radacct');
+    }
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }

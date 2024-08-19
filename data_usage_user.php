@@ -39,13 +39,13 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 10)
         $row->acctInputOctets = convert_bytes($row->acctinputoctets);
         $row->totalBytes = convert_bytes($row->acctoutputoctets + $row->acctinputoctets);
 
-        if (isMysqlRadius()) {
+        if (isTableExist) {
             $lastRecord = ORM::for_table('radacct')
                 ->where('username', $row->username)
                 ->where_not_equal('acctoutputoctets', 0)
                 ->order_by_desc('acctstoptime')
                 ->find_one();
-        } else {
+        } elseif(isTableExist('rad_acct')) {
             $lastRecord = ORM::for_table('rad_acct')
                 ->where('username', $row->username)
                 ->where_not_equal('acctoutputoctets', 0)

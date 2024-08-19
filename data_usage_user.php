@@ -25,7 +25,11 @@ function UserDataUsage()
 
 function fetch_user_in_out_data($search = '', $page = 1, $perPage = 10)
 {
+    if(isTableExist('rad_acct')){
     $query = ORM::for_table('rad_acct');
+    }else{
+        $query = ORM::for_table('radacct');
+    }
     $query->where_not_equal('acctoutputoctets', 0.00);
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
@@ -39,7 +43,7 @@ function fetch_user_in_out_data($search = '', $page = 1, $perPage = 10)
         $row->acctInputOctets = convert_bytes($row->acctinputoctets);
         $row->totalBytes = convert_bytes($row->acctoutputoctets + $row->acctinputoctets);
 
-        if (isTableExist) {
+        if (isTableExist('radacct')) {
             $lastRecord = ORM::for_table('radacct')
                 ->where('username', $row->username)
                 ->where_not_equal('acctoutputoctets', 0)

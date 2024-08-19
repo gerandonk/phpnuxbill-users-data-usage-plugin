@@ -1,4 +1,4 @@
-{include file="user-ui/header.tpl"}
+{include file="sections/header.tpl"}
 <div class="row">
     <div class="col-sm-12">
         <div class="panel panel-hovered mb20 panel-primary">
@@ -63,7 +63,7 @@
         </div>
     </div>
 </div>
-{include file="user-ui/footer.tpl"}
+{include file="sections/footer.tpl"}
 
 <script>
     window.addEventListener('DOMContentLoaded', function() {

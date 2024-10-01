@@ -26,31 +26,45 @@ function UserDataUsageAdmin()
 
 function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 {
-     if(isTableExist('rad_acct')){
-    $query = ORM::for_table('rad_acct')->whereNotEqual('acctoutputoctets', 0);
-     }else{
-         $query = ORM::for_table('radacct')->whereNotEqual('acctoutputoctets', 0);
-     }
+    // Check for the existence of the table and initialize query accordingly
+    if (isTableExist('rad_acct')) {
+        $query = ORM::for_table('rad_acct')->where_not_equal('acctoutputoctets', 0);
+    } else {
+        $query = ORM::for_table('radacct')->where_not_equal('acctoutputoctets', 0);
+    }
+
+    // Handle search functionality
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
 
+    // Apply pagination limits
     $query->limit($perPage)->offset(($page - 1) * $perPage);
     $data = Paginator::findMany($query, [], $perPage);
 
+    // Processing each record
     foreach ($data as &$row) {
+        // Converting octet values into readable formats
         $row->acctOutputOctets = convert_bytes_admin(floatval($row->acctoutputoctets));
         $row->acctInputOctets = convert_bytes_admin(floatval($row->acctinputoctets));
-        $row->totalBytes = convert_bytes_admin(floatval($row->acctoutputoctets)+ floatval($row->acctunputoctets));
-         if(isTableExist('rad_acct')){
-        $lastRecord = ORM::for_table('rad_acct');
-        }else{
-          $lastRecord = ORM::for_table('radacct')
-         }
-            ->where('username', $row->username)->whereNotEqual('acctoutputoctets', 0)
-            ->order_by_desc('acctstatustype')
-            ->find_one();
+        $row->totalBytes = convert_bytes_admin(floatval($row->acctoutputoctets) + floatval($row->acctinputoctets));
 
+        // Fetch the last record for status determination
+        if (isTableExist('rad_acct')) {
+            $lastRecord = ORM::for_table('rad_acct')
+                ->where('username', $row->username)
+                ->where_not_equal('acctoutputoctets', 0)
+                ->order_by_desc('acctstatustype')
+                ->find_one();
+        } else {
+            $lastRecord = ORM::for_table('radacct')
+                ->where('username', $row->username)
+                ->where_not_equal('acctoutputoctets', 0)
+                ->order_by_desc('acctstatustype')
+                ->find_one();
+        }
+
+        // Set connection status based on the last record's type
         if ($lastRecord && $lastRecord->acctstatustype == 'Start') {
             $row->status = '<span class="badge btn-success">Connected</span>';
         } else {
@@ -63,14 +77,19 @@ function fetch_user_in_out_data_admin($search = '', $page = 1, $perPage = 10)
 
 function count_user_in_out_data_admin($search = '')
 {
-    if(isTableExist('rad_acct')){
+    // Check for the existence of the table and initialize query accordingly
+    if (isTableExist('rad_acct')) {
         $query = ORM::for_table('rad_acct');
-    }else{
-          $query = ORM::for_table('radacct');
+    } else {
+        $query = ORM::for_table('radacct');
     }
+
+    // Apply search filter if applicable
     if ($search) {
         $query->where_like('username', '%' . $search . '%');
     }
+
+    // Return the total count of records
     return $query->count();
 }
 

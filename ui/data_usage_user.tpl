@@ -1,4 +1,4 @@
-{include file="customer/header.tpl"}
+{include file="user-ui/header.tpl"}
 
 <div class="row">
     <div class="col-sm-6">
@@ -138,4 +138,4 @@
     });
 </script>
 
-{include file="customer/footer.tpl"}
+{include file="user-ui/footer.tpl"}
